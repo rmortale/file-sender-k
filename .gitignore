@@ -8,3 +8,4 @@ mvnw.cmd
 .mvn
 application-do-not-commit.properties
 integration.yaml
+secret.properties
