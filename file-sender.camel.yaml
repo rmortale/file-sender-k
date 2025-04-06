@@ -1,0 +1,28 @@
+- route:
+    id: filesender-route
+    from:
+      id: from-kafka
+      uri: kamelet:kafka-not-secured-source
+      parameters:
+        bootstrapServers: "{{app.bootstrapServers}}"
+        consumerGroup: "{{app.consumerGroup}}"
+        topic: "{{app.topicNames}}"
+      steps:
+        - setHeaders:
+            id: extract file names
+            headers:
+              - expression:
+                  jq:
+                    expression: header("kafka.KEY") | split("/")[1:] | join("/")
+                name: CamelAwsS3Key
+              - expression:
+                  jq:
+                    expression: header("kafka.KEY") | split("/")[0]
+                name: CamelAwsS3BucketName
+        - to:
+            id: download from minio
+            uri: aws2-s3://dummybucket
+        - to:
+            id: save to local dir
+            uri: file://{{app.localDir}}
+        - log: "Saved to: ${header.CamelFileNameProduced}"

@@ -1,0 +1,9 @@
+.vscode
+.camel-jbang-run
+.idea
+.camel-jbang
+target
+mvnw
+mvnw.cmd
+.mvn
+application-do-not-commit.properties
