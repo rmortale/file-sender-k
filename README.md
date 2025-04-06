@@ -1,6 +1,6 @@
 # Nextgen filesender
 
-This route gets notifications from minio, downloads the file and sends it to destination.
+This camel route gets notifications from minio, downloads the file and sends it to destination.
 
 ## How-to run
 
@@ -15,7 +15,7 @@ kamel run --dev  --property file:application.properties -t camel.runtime-provide
 ```
 
 ## Export
-Create ConfigMap and Secrets first from the application.properties:
+First create ConfigMap and Secrets from the application.properties:
 
 ```
 kubectl create secret generic file-sender-secret --from-env-file local-secrets.properties
@@ -23,11 +23,19 @@ kubectl create secret generic file-sender-secret --from-env-file local-secrets.p
 kubectl create cm file-sender-cm --from-file local.properties
 ```
 
-then export with:
+then run the integration with:
 
 ```sh
-kamel run --config secret:file-sender-secret --config configmap:file-sender-cm -t camel.runtime-provider=plain-quarkus file-sender.camel.yaml -o yaml > integration.yaml
+kamel run --config secret:file-sender-secret --config configmap:file-sender-cm -t camel.runtime-provider=plain-quarkus file-sender.camel.yaml
 ```
+
+Now open a second terminal and run the following command:
+
+```sh
+kamel promote file-sender --to prod -o yaml > integration.yaml
+```
+
+Then apply integration.yaml to your cluster.
 
 ## Route
 
