@@ -15,10 +15,18 @@ kamel run --dev  --property file:application.properties -t camel.runtime-provide
 ```
 
 ## Export
-Create ConfigMap and Secrets first from the application.properties, then export with:
+Create ConfigMap and Secrets first from the application.properties:
+
+```
+kubectl create secret generic file-sender-secret --from-env-file local-secrets.properties
+
+kubectl create cm file-sender-cm --from-file local.properties
+```
+
+then export with:
 
 ```sh
-kamel run --config secret:mysecret --config configmap:myconfigmap -t camel.runtime-provider=plain-quarkus file-sender.camel.yaml -o yaml > integration.yaml
+kamel run --config secret:file-sender-secret --config configmap:file-sender-cm -t camel.runtime-provider=plain-quarkus file-sender.camel.yaml -o yaml > integration.yaml
 ```
 
 ## Route
