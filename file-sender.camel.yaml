@@ -44,7 +44,7 @@
       id: upload
       uri: seda:toSftp
       parameters:
-        concurrentConsumers: 15
+        concurrentConsumers: 6
       steps:
         - to:
             id: upload to sftp
