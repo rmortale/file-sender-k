@@ -43,11 +43,9 @@
       uri: file://{{app.localDir}}
       parameters:
         autoCreate: true
-        moveFailed: "{{app.localDir}}/failed/${date:now:yyyy-MM-dd}"
-        move: "{{app.localDir}}/done/${date:now:yyyy-MM-dd}"
-        initialDelay: 0
-        delay: 5
-        maxMessagesPerPoll: 1
+        moveFailed: "{{app.localDir}}/failed/${date:now:yyyy-MM-dd}/"
+        move: "{{app.localDir}}/done/${date:now:yyyy-MM-dd}/"
+        maxMessagesPerPoll: 3
       steps:
         - to:
             id: upload to sftp
