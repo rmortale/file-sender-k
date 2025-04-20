@@ -4,6 +4,8 @@ This camel route gets notifications from minio, downloads the file and sends it 
 
 ## How-to run
 
+Change to the kube context of the desired cluster (k3d-devt) to the camel-k namespace first.
+
 ### Local dev with kamel
 
 Replace properties in `application.properties` with your values.

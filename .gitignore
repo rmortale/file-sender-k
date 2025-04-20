@@ -9,3 +9,6 @@ mvnw.cmd
 application-do-not-commit.properties
 integration.yaml
 secret.properties
+files/1gig-11.file
+files/1gig-12.file
+files/1gig-13.file
