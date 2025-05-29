@@ -1,10 +1,34 @@
-# Nextgen filesender
+# Simple filesender
 
-This camel route gets notifications from minio, downloads the file and sends it to destination.
+This filesender service consists in two microservices (camel routes). One service gets notifications from minio and downloads the file to a PVC. The second service polls the PVC for files and transfers them to destination (SFTP).
+
+## Prerequisites
+* Kafka cluster
+* Minio service with one Bucket with `put` events forwarded to Kafka topic
+* Kubernetes cluster with Camel-K Operator
+
 
 ## How-to run
 
-Change to the kube context of the desired cluster (k3d-devt) to the camel-k namespace first.
+### Secret Configuration
+
+For convenience, create a secret to contain the sensitive properties in the `application.properties` file:
+
+```
+kubectl create secret generic fileservice-props --from-file application.properties
+```
+
+Then create the PVC, and run the microservices.
+
+```
+kubectl apply -f fileservice-pvc.yaml
+
+kamel run --dev --config secret:fileservice-props --volume fileservice-pvc:/files file-downloader.camel.yaml
+
+kamel run --dev --config secret:fileservice-props --volume fileservice-pvc:/files pvc-consumer.yaml
+```
+
+
 
 ### Local dev with kamel
 
