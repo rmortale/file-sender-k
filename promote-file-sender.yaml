@@ -1,0 +1,37 @@
+apiVersion: camel.apache.org/v1
+kind: Integration
+metadata:
+  creationTimestamp: null
+  name: file-sender
+  namespace: prod
+spec:
+  flows:
+  - route:
+      from:
+        id: from-local-dir
+        parameters:
+          autoCreate: true
+          maxMessagesPerPoll: 3
+          move: ../done
+          moveFailed: ../failed
+        steps:
+        - log: 'headers: ${headers}'
+        uri: file://{{app.localDir}}/ready
+      id: filesender-upload
+      streamCache: false
+  traits:
+    camel:
+      runtimeVersion: 3.15.2
+    container:
+      image: ghcr.io/rmortale/camel-k/camel-k-kit-d0t0q3nnkqac73clb0bg@sha256:eac67f949ac7efed13117978e602db01eb3d06cd81093a6b55054d80742a2ae3
+    jvm:
+      classpath: dependencies/*:dependencies/app/*:dependencies/lib/boot/*:dependencies/lib/main/*:dependencies/quarkus/*
+    mount:
+      configs:
+      - secret:files-sender-props
+      volumes:
+      - fileservice-pvc:/files
+    pull-secret:
+      imagePullerDelegation: false
+      secretName: registry-secret
+status: {}

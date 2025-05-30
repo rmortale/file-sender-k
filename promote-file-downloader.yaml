@@ -1,0 +1,61 @@
+apiVersion: camel.apache.org/v1
+kind: Integration
+metadata:
+  creationTimestamp: null
+  name: file-downloader
+  namespace: prod
+spec:
+  flows:
+  - route:
+      from:
+        id: from-kafka
+        parameters:
+          bootstrapServers: '{{app.bootstrapServers}}'
+          consumerGroup: '{{app.consumerGroup}}'
+          topic: '{{app.topicNames}}'
+        steps:
+        - setHeaders:
+            headers:
+            - expression:
+                jq:
+                  expression: header("kafka.KEY") | split("/")[1:] | join("/")
+              name: CamelAwsS3Key
+            - expression:
+                jq:
+                  expression: header("kafka.KEY") | split("/")[0]
+              name: CamelAwsS3BucketName
+            - expression:
+                jq:
+                  expression: header("kafka.KEY") | split("/")[-1]
+              name: SourceFileName
+            id: extract file names
+        - to:
+            id: download from minio
+            uri: aws2-s3://dummybucket
+        - to:
+            id: save to local dir
+            uri: file://{{app.localDir}}/ready?tempPrefix=../temp/
+        - log: 'Saved ${header.SourceFileName} from bucket ${header.CamelAwsS3BucketName}
+            to ${headers.CamelFileNameProduced}, size: ${header.CamelAwsS3ContentLength}
+            bytes'
+        uri: kamelet:kafka-not-secured-source
+      id: filedownloader-route
+      streamCache: false
+  traits:
+    camel:
+      runtimeVersion: 3.15.2
+    container:
+      image: ghcr.io/rmortale/camel-k/camel-k-kit-d0sc02vsa5sc73b9dnf0@sha256:23779c7731042032da95bb4ccf6b3410cbee849642a8337e675e9af6022bd939
+    jvm:
+      classpath: dependencies/*:dependencies/app/*:dependencies/lib/boot/*:dependencies/lib/main/*:dependencies/quarkus/*
+    kamelets:
+      list: kafka-not-secured-source,sink
+    mount:
+      configs:
+      - secret:fileservice-props
+      volumes:
+      - fileservice-pvc:/files
+    pull-secret:
+      imagePullerDelegation: false
+      secretName: registry-secret
+status: {}
