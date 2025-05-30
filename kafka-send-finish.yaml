@@ -1,0 +1,15 @@
+
+## possible send of kafka message instead of file polling
+  - log: "headers ${headers}"
+        - setBody:
+            id: set body
+            expression:
+              simple:
+                expression: "${header.CamelFileNameProduced},${header.SourceFileName},${header.CamelAwsS3BucketName},${header.CamelAwsS3ContentLength},${header.CamelAwsS3ContentType}"
+        - to:
+            id: send to kafka
+            uri: kamelet:kafka-not-secured-sink
+            parameters:
+              bootstrapServers: "{{app.bootstrapServers}}"
+              topic: eventbus
+        - log: "Sent file ${header.SourceFileName} to kafka topic: eventbus"

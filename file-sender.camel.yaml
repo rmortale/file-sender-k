@@ -1,0 +1,15 @@
+- route:
+    id: filesender-upload
+    ## streamCache false is used to upload large files without loading them in memory
+    streamCache: false
+    from:
+      id: from-local-dir
+      uri: file://{{app.localDir}}/ready
+      parameters:
+        autoCreate: true
+        moveFailed: ../failed
+        move: ../done
+        maxMessagesPerPoll: 3
+      steps:
+        - log: "headers: ${headers}"
+        ## TODO: continue with the file upload

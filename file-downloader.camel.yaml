@@ -24,13 +24,12 @@
               - expression:
                   jq:
                     expression: header("kafka.KEY") | split("/")[-1]
-                name: file
+                name: SourceFileName
         - to:
             id: download from minio
             uri: aws2-s3://dummybucket
         - to:
             id: save to local dir
             uri: file://{{app.localDir}}/ready?tempPrefix=../temp/
-        - log: "Saved ${header.file} from bucket ${header.CamelAwsS3BucketName} to: {{app.localDir}}"
-        - log: "headers ${headers}"
-
+        - log: "Saved ${header.SourceFileName} from bucket ${header.CamelAwsS3BucketName} to ${headers.CamelFileNameProduced}, size: ${header.CamelAwsS3ContentLength} bytes"
+      
